@@ -22,7 +22,7 @@ model User {
 model Restaurant {
   id       String    @id @default(uuid())
   name     String
-  adress   String
+  address   String
   imageUrl String
   Plate    Plate[]
   Booking  Booking[]
@@ -34,7 +34,7 @@ model Plate {
   price        Decimal    @db.Decimal(10, 2)
   restaurantId String
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  descripition String
+  description String
   imageUrl     String
 }
 
