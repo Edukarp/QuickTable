@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Footer from "./_components/footer";
 //import Footer from "./_components/footer";
 //import AuthProvider from "./_providers/auth";
 //import { Toaster } from "./_components/ui/sonner";
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} dark`}>
           <div className="flex-1">{children}</div>
+          <Footer />
       </body>
     </html>
   );

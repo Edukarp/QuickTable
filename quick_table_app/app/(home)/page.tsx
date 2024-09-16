@@ -43,6 +43,16 @@ export default async function Home() {
         </div>
       </div>
 
+      <div className= "mt-6 mb-16">
+        <h2 className="px-5 text-xs mb-3 uppercase text-gray-400 font-bold">Populares</h2>
+
+        <div  className="pl-2 flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden"> 
+          {restaurants.map((restaurant) => (
+            <RestaurantItem key={restaurant.id} restaurant={restaurant} />
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }
