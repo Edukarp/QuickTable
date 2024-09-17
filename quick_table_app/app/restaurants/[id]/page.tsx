@@ -2,6 +2,7 @@
 import { db } from "@/app/_lib/prisma";
 
 import RestaurantInfo from "./_components/restaurant-info";
+import PlateItem from "./_components/plate-item";
 
 interface RestaurantDetailProps{
     params: {
@@ -18,6 +19,9 @@ const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
     const restaurant = await db.restaurant.findUnique({
             where: {
                 id: params.id,
+            },
+            include: {
+                Plate: true,
             },   
         });
 
@@ -28,6 +32,11 @@ const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
         return (
             <div>
                 <RestaurantInfo restaurant={restaurant}/>
+                <div className="px-5 flex flex-col gap-4 py-6">
+                    {restaurant.Plate.map((plate) => (
+                        <PlateItem key={plate.id} plate={plate}/>
+                    ))}
+                </div>
             </div>
         
         )
