@@ -1,13 +1,23 @@
+"use client"
+
 import { Button } from "@/app/_components/ui/button";
 import { Card, CardContent } from "@/app/_components/ui/card";
 import { Plate } from "@prisma/client";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 
 interface PlateItemProps {
-    plate: Plate
+    plate: Plate;
+    isAuthenticated?: boolean;
 }
 
-const PlateItem = ({plate}: PlateItemProps) => {
+const PlateItem = ({plate, isAuthenticated}: PlateItemProps) => {
+    const handleBookingClick = () => {
+        if(!isAuthenticated) {
+            return signIn("google");
+        }
+        //TODO: Implement booking
+    }
     return ( 
         <Card>
             <CardContent className="p-3 w-full">
@@ -23,7 +33,9 @@ const PlateItem = ({plate}: PlateItemProps) => {
                             <p className="text-primary font-bold">
                                 {Intl.NumberFormat("pt-BR", {style: "currency", currency: "BRL"}).format(Number(plate.price))}
                             </p>
-                            <Button variant="secondary" className="text-primary">Reservar</Button>
+                            <Button variant="secondary" className="text-primary" onClick={handleBookingClick}>
+                                Reservar
+                            </Button>
                         </div>
                     </div>
                 </div>

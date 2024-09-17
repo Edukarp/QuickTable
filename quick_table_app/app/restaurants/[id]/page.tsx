@@ -3,6 +3,8 @@ import { db } from "@/app/_lib/prisma";
 
 import RestaurantInfo from "./_components/restaurant-info";
 import PlateItem from "./_components/plate-item";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface RestaurantDetailProps{
     params: {
@@ -12,6 +14,7 @@ interface RestaurantDetailProps{
 
 
 const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
+    const session = await  getServerSession(authOptions);
     if(!params.id){
         //TODO: return homepage
         return null;
@@ -21,7 +24,7 @@ const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
                 id: params.id,
             },
             include: {
-                Plate: true,
+                plates: true,
             },   
         });
 
@@ -33,8 +36,8 @@ const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
             <div>
                 <RestaurantInfo restaurant={restaurant}/>
                 <div className="px-5 flex flex-col gap-4 py-6">
-                    {restaurant.Plate.map((plate) => (
-                        <PlateItem key={plate.id} plate={plate}/>
+                    {restaurant.plates.map((plate) => (
+                        <PlateItem key={plate.id} plate={plate} isAuthenticated={!!session?.user}/>
                     ))}
                 </div>
             </div>
