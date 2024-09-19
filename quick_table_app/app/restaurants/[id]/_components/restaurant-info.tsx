@@ -4,18 +4,19 @@ import SideMenu from "@/app/_components/side-menu";
 import { Button } from "@/app/_components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/app/_components/ui/sheet";
 import { Calendar } from "@/app/_components/ui/calendar"
-import { Restaurant } from "@prisma/client";
+import { Booking, Restaurant } from "@prisma/client";
 import { ChevronLeftIcon, Loader2, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ptBR } from "date-fns/locale";
 import { generateDayTimeList } from "../_helpers/hours";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { format, set, setHours, setMinutes } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../_actions/saveBooking";
 import { toast } from "sonner";
+import { getDayBookings } from "../_actions/get-day-bookings";
 
 
 interface RestaurantInfoProps{
@@ -31,12 +32,47 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
     const [hour, setHour] = useState<string | undefined>()
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
     const [sheetIsOpen, setSheetIsOpen] = useState(false);
+    const [dayBookings, setDayBookings] = useState<Booking[]>([]);
 
     const {data} = useSession();
 
+    useEffect(() => {
+        if(!date){
+            return;
+        }
+        const refreshAvailableHours = async () => {
+             const _dayBookings = await getDayBookings(restaurant.id, date);
+             setDayBookings(_dayBookings);
+        }
+        refreshAvailableHours();
+    }, [date])
+
+
     const timeList = useMemo(() => {
-        return date ? generateDayTimeList(date) : [];
-    }, [date]);
+        if (!date) {
+            return [];
+        }
+    
+        return generateDayTimeList(date).filter(time => {
+            //Se houver uma reserva em daybookings iguais nao vai incluir
+            const timeHour = Number(time.split(":")[0]);
+            const timeMinutes = Number(time.split(":")[1]);
+
+            const booking = dayBookings.find((booking) => {
+                const bookingHour = booking.date.getHours();
+                const bookingMinutes = booking.date.getMinutes();
+
+                return bookingHour === timeHour && bookingMinutes === timeMinutes;
+                
+            })
+
+            if(!booking){
+                return true;
+            }
+            return false;
+
+        });
+    }, [date, dayBookings]);
 
 
     const handleBackClick = () => {
