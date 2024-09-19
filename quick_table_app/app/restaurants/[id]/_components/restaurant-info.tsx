@@ -13,8 +13,9 @@ import { useMemo, useState } from "react";
 import { ptBR } from "date-fns/locale";
 import { generateDayTimeList } from "../_helpers/hours";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { format, setHours, setMinutes } from "date-fns";
+import { format, set, setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../_actions/saveBooking";
+import { toast } from "sonner";
 
 
 interface RestaurantInfoProps{
@@ -29,6 +30,7 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
     const [date, setDate] = useState<Date | undefined>(undefined)
     const [hour, setHour] = useState<string | undefined>()
     const [submitIsLoading, setSubmitIsLoading] = useState(false);
+    const [sheetIsOpen, setSheetIsOpen] = useState(false);
 
     const {data} = useSession();
 
@@ -73,6 +75,18 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
                 userId: data.user.id
             });
 
+            setSheetIsOpen(false);
+            setHour(undefined);
+            setDate(undefined);
+            toast("Reserva efetuada com sucesso!", {
+                description: format(newDate, "'Para' dd 'de' MMMM 'às' HH':'mm'.' ",{
+                    locale: ptBR,
+                }),
+                action: {
+                    label: "Vizualizar",
+                    onClick: () => router.push("/bookings")
+                },
+            });
         } catch(error){
             console.error(error)
         } finally {
@@ -117,7 +131,7 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
                 </div>
 
                 <div className="pr-8 py-10">
-                    <Sheet>
+                    <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
                         <SheetTrigger asChild>
                             <Button variant="secondary" className="text-primary" onClick={handleBookingClick}>
                                 Reservar
