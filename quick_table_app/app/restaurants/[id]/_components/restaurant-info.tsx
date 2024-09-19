@@ -2,12 +2,19 @@
 
 import SideMenu from "@/app/_components/side-menu";
 import { Button } from "@/app/_components/ui/button";
-import { Sheet, SheetTrigger, SheetContent } from "@/app/_components/ui/sheet";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/app/_components/ui/sheet";
+import { Calendar } from "@/app/_components/ui/calendar"
 import { Restaurant } from "@prisma/client";
 import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
+import { ptBR } from "date-fns/locale";
+import { generateDayTimeList } from "../_helpers/hours";
+import { Card, CardContent } from "@/app/_components/ui/card";
+import { format } from "date-fns";
+
 
 interface RestaurantInfoProps{
     restaurant: Restaurant; 
@@ -25,6 +32,22 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
         }
         //TODO: Implement booking
     }
+
+    const handleDateClick = (date: Date | undefined) => {
+        setDate(date);
+        setHour(undefined);
+    }
+    const handleHourClick = (time: string) => {
+        setHour(time);
+    }
+
+    const [date, setDate] = useState<Date | undefined>(undefined)
+    const [hour, setHour] = useState<string | undefined>()
+
+    const timeList = useMemo(() => {
+        return date ? generateDayTimeList(date) : [];
+    }, [date]);
+
     return (  
         <div>
             <div className="h-[250px] w-full relative">
@@ -60,10 +83,90 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
                         <p className="text-sm">5,0 (379 avaliações)</p>
                     </div>
                 </div>
+
                 <div className="pr-8 py-10">
-                    <Button variant="secondary" className="text-primary" onClick={handleBookingClick}>
-                        Reservar
-                    </Button>
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            <Button variant="secondary" className="text-primary" onClick={handleBookingClick}>
+                                Reservar
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent className="p-0">
+                            <SheetHeader className="text-left px-5 py-6 border-b border-solid border-secondary">
+                                <SheetTitle>Fazer Reserva</SheetTitle>
+                            </SheetHeader>
+                            <div className="py-6">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={handleDateClick}
+                                    locale={ptBR}
+                                    fromDate={new Date()}
+                                    styles={{
+                                        head_cell:{
+                                            width: "100%",
+                                            textTransform: "capitalize",
+                                        },
+                                        cell: {
+                                            width: "100%",
+                                        },
+                                        button: {
+                                            width: "100%",
+                                        },
+                                        nav_button_previous: {
+                                            width: "32px",
+                                            height: "32px",
+                                        },
+                                        nav_button_next: {
+                                            width: "32px",
+                                            height: "32px",
+                                        },
+                                        caption:{
+                                            textTransform: "capitalize",
+                                        }
+                                    }}
+                                />
+                            </div>
+                            {date && (
+                                <div className=" flex gap-3 overflow-x-auto py-6, px-5 mb-4 [&::-webkit-scrollbar]:hidden">
+                                    {timeList.map((time) => (
+                                        <Button variant={hour == time ? "default" : "outline"} className="rounded-full pt-2" key={time} onClick={() => handleHourClick(time)}>{time}</Button>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="py-4 px-5 border-t border-solid border-secondary">
+                                <Card>
+                                    <CardContent className="p-3">
+                                        <div className="flex justify-between">
+                                            <h2 className="font-bold">{restaurant.name}</h2>
+                                        </div>
+                                        <div className="flex justify-between pb-2">
+                                            <h2 className="text-sm text-gray-400">{restaurant.address}</h2>
+                                        </div>
+                                        {date && (
+                                            <div className="flex justify-between">
+                                                <h3 className="text-gray-400">Data</h3>
+                                                <h4 className="text-sm">{format(date, "dd 'de ' MMMM", {locale: ptBR})}</h4>
+                                            </div>
+
+                                        )}
+                                        {hour && (
+                                            <div className="flex justify-between">
+                                                <h3 className="text-gray-400">Horário</h3>
+                                                <h4 className="text-sm">{hour}</h4>
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            </div>
+                            <SheetFooter>
+                                    <Button disabled={!date || !hour}>Confirmar Reserva</Button>
+                            </SheetFooter>
+
+
+                        </SheetContent>
+                    </Sheet>
                 </div>
             </div>
         </div>
