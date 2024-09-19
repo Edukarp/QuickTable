@@ -5,15 +5,16 @@ import { Button } from "@/app/_components/ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/app/_components/ui/sheet";
 import { Calendar } from "@/app/_components/ui/calendar"
 import { Restaurant } from "@prisma/client";
-import { ChevronLeftIcon, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { ChevronLeftIcon, Loader2, MapPinIcon, MenuIcon, StarIcon } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { ptBR } from "date-fns/locale";
 import { generateDayTimeList } from "../_helpers/hours";
 import { Card, CardContent } from "@/app/_components/ui/card";
-import { format } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
+import { saveBooking } from "../_actions/saveBooking";
 
 
 interface RestaurantInfoProps{
@@ -22,7 +23,20 @@ interface RestaurantInfoProps{
 }
 
 const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
+
     const router = useRouter();
+
+    const [date, setDate] = useState<Date | undefined>(undefined)
+    const [hour, setHour] = useState<string | undefined>()
+    const [submitIsLoading, setSubmitIsLoading] = useState(false);
+
+    const {data} = useSession();
+
+    const timeList = useMemo(() => {
+        return date ? generateDayTimeList(date) : [];
+    }, [date]);
+
+
     const handleBackClick = () => {
         router.replace("/");
     }
@@ -30,7 +44,6 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
         if(!isAuthenticated) {
             return signIn("google");
         }
-        //TODO: Implement booking
     }
 
     const handleDateClick = (date: Date | undefined) => {
@@ -41,12 +54,31 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
         setHour(time);
     }
 
-    const [date, setDate] = useState<Date | undefined>(undefined)
-    const [hour, setHour] = useState<string | undefined>()
+    const handleBookingSubmit = async () => {
+        try{
+            setSubmitIsLoading(true);
+            if(!date || !hour || !data?.user){
+                return;
+            }
 
-    const timeList = useMemo(() => {
-        return date ? generateDayTimeList(date) : [];
-    }, [date]);
+            const dateHour = Number(hour.split(":")[0]);
+            const dateMinutes = Number(hour.split(":")[1]);
+
+            const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
+
+
+            await saveBooking({
+                restaurantId: restaurant.id, 
+                date: newDate,
+                userId: data.user.id
+            });
+
+        } catch(error){
+            console.error(error)
+        } finally {
+            setSubmitIsLoading(false);
+        }
+    }    
 
     return (  
         <div>
@@ -161,7 +193,10 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
                                 </Card>
                             </div>
                             <SheetFooter>
-                                    <Button disabled={!date || !hour}>Confirmar Reserva</Button>
+                                    <Button onClick={handleBookingSubmit} disabled={!date || !hour || submitIsLoading}>
+                                        {submitIsLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                        Confirmar Reserva
+                                    </Button>
                             </SheetFooter>
 
 
