@@ -34,11 +34,14 @@ const RestaurantDetailPage = async ({params} : RestaurantDetailProps) => {
         }
         return (
             <div>
-                <RestaurantInfo restaurant={restaurant}/>
-                <div className="px-5 flex flex-col gap-4 py-6">
-                    {restaurant.plates.map((plate) => (
-                        <PlateItem key={plate.id} plate={plate} isAuthenticated={!!session?.user}/>
-                    ))}
+                <RestaurantInfo restaurant={restaurant} isAuthenticated={!!session?.user}/>
+                <div>
+                    <h2 className="px-5 text-[15px] mt-3 uppercase text-gray-400 font-bold">Cardápio</h2>
+                    <div className="px-5 flex flex-col gap-4 py-4">
+                        {restaurant.plates.map((plate) => (
+                            <PlateItem key={plate.id} plate={plate}/>
+                        ))}
+                    </div>
                 </div>
             </div>
         
