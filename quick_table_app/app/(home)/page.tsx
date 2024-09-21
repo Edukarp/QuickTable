@@ -2,7 +2,7 @@ import Header from "../_components/header";
 import {format} from "date-fns";
 import {ptBR} from "date-fns/locale"
 import Search from "./_components/search";
-import BookingItem from "../_components/booking-file";
+import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import RestaurantItem from "./_components/restaurant-item";
 
