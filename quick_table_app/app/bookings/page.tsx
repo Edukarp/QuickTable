@@ -4,7 +4,6 @@ import { authOptions } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "../_lib/prisma";
 import BookingItem from "../_components/booking-item";
-import { isFuture, isPast } from "date-fns";
 
 const BookingsPage = async () => {
 
@@ -14,17 +13,33 @@ const BookingsPage = async () => {
         return redirect("/");
     }
 
-    const bookings = await db.booking.findMany({
-        where: {
-            userId: session.user.id
-        },
-        include: {
-            restaurant: true,
-        }
-    });
+    //const confirmedBookings = bookings.filter((booking) => isFuture(booking.date));
+    //const finishedBookings = bookings.filter((booking) => isPast(booking.date));
 
-    const confirmedBookings = bookings.filter((booking) => isFuture(booking.date));
-    const finishedBookings = bookings.filter((booking) => isPast(booking.date));
+    const [confirmedBookings, finishedBookings] = await Promise.all([ //deixa em paralelo
+        db.booking.findMany({
+            where: {
+                userId: session.user.id,
+            date: {
+                gte: new Date(),
+            }
+        },
+            include: {
+                restaurant: true,
+            }
+        }),
+        db.booking.findMany({
+            where: {
+                userId: session.user.id,
+            date: {
+                lt: new Date(),
+            }
+        },
+            include: {
+                restaurant: true,
+            }
+        }),
+    ])
 
     return (
         <>
