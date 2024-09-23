@@ -60,7 +60,9 @@ export default async function Home() {
 
         <div  className="pl-2 flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden"> 
           {restaurants.map((restaurant) => (
-            <RestaurantItem key={restaurant.id} restaurant={restaurant} />
+            <div key={restaurant.id} className="min-w-[167px] max-w-[167px]">
+              <RestaurantItem  restaurant={restaurant} />
+            </div>
           ))}
         </div>
       </div>
@@ -70,7 +72,9 @@ export default async function Home() {
 
         <div  className="pl-2 flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden"> 
           {restaurants.map((restaurant) => (
-            <RestaurantItem key={restaurant.id} restaurant={restaurant} />
+              <div key={restaurant.id} className="min-w-[167px] max-w-[167px]">
+                <RestaurantItem  restaurant={restaurant} />
+              </div>
           ))}
         </div>
       </div>
