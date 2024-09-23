@@ -4,7 +4,7 @@ import { db } from "@/app/_lib/prisma";
 import RestaurantInfo from "./_components/restaurant-info";
 import PlateItem from "./_components/plate-item";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/_lib/auth";
 
 interface RestaurantDetailProps{
     params: {
