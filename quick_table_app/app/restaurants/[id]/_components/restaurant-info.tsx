@@ -45,7 +45,7 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
              setDayBookings(_dayBookings);
         }
         refreshAvailableHours();
-    }, [date])
+    }, [date, restaurant.id]);
 
 
     const timeList = useMemo(() => {
