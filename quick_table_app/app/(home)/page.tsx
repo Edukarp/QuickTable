@@ -11,20 +11,30 @@ import { authOptions } from "../_lib/auth";
 
 export default async function Home() {
 
-  //Chamar prisma e pegar restaurantes
-  const restaurants = await db.restaurant.findMany({});
   const session = await getServerSession(authOptions);
-  const confirmedBookings = session?.user ? await db.booking.findMany({
-    where: {
-      userId: (session.user as any).id,
-      date: {
-        gte: new Date(),
+
+  const[restaurants, recommendedRestaurants, confirmedBookings] = await Promise.all([
+    db.restaurant.findMany({}),
+    db.restaurant.findMany({
+      orderBy: {
+        id: "asc",
       },
-    },
-    include: {
-      restaurant: true,
-    },
-  }) : [];
+    }),
+    session?.user ? db.booking.findMany({
+      where: {
+        userId: (session.user as any).id,
+        date: {
+          gte: new Date(),
+
+        },
+
+      },
+      include: {
+        restaurant: true,
+      },
+    })
+    : Promise.resolve([]),
+  ]);
 
   return (
     <div>
@@ -42,7 +52,7 @@ export default async function Home() {
           )} </p>
         </div>
       <div className="px-5 mt-6">
-        <Search />
+        <Search defaultValues={undefined} />
       </div>
       {confirmedBookings.length > 0 && (
         <div className="px-5 mt-6">
@@ -71,9 +81,9 @@ export default async function Home() {
         <h2 className="px-5 text-xs mb-3 uppercase text-gray-400 font-bold">Populares</h2>
 
         <div  className="pl-2 flex gap-4 overflow-x-auto [&::-webkit-scrollbar]:hidden"> 
-          {restaurants.map((restaurant) => (
+          {recommendedRestaurants.map((restaurant) => (
               <div key={restaurant.id} className="min-w-[167px] max-w-[167px]">
-                <RestaurantItem  restaurant={restaurant} />
+                <RestaurantItem restaurant={restaurant} />
               </div>
           ))}
         </div>
