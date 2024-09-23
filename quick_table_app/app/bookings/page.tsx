@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import Header from "../_components/header";
-import { authOptions } from "@/app/_lib/auth";
+import { authOptions } from "../_lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "../_lib/prisma";
 import BookingItem from "../_components/booking-item";
@@ -19,7 +19,7 @@ const BookingsPage = async () => {
     const [confirmedBookings, finishedBookings] = await Promise.all([ //deixa em paralelo
         db.booking.findMany({
             where: {
-                userId: session.user.id,
+                userId: (session.user as any).id,
             date: {
                 gte: new Date(),
             }
@@ -30,7 +30,7 @@ const BookingsPage = async () => {
         }),
         db.booking.findMany({
             where: {
-                userId: session.user.id,
+                userId: (session.user as any).id,
             date: {
                 lt: new Date(),
             }

@@ -108,7 +108,7 @@ const RestaurantInfo = ({restaurant, isAuthenticated}: RestaurantInfoProps) => {
             await saveBooking({
                 restaurantId: restaurant.id, 
                 date: newDate,
-                userId: data.user.id
+                userId: (data.user as any).id
             });
 
             setSheetIsOpen(false);

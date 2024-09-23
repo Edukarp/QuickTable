@@ -6,7 +6,7 @@ import BookingItem from "../_components/booking-item";
 import { db } from "../_lib/prisma";
 import RestaurantItem from "./_components/restaurant-item";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/_lib/auth";
+import { authOptions } from "../_lib/auth";
 
 
 export default async function Home() {
@@ -16,7 +16,7 @@ export default async function Home() {
   const session = await getServerSession(authOptions);
   const confirmedBookings = session?.user ? await db.booking.findMany({
     where: {
-      userId: session?.user?.id,
+      userId: (session.user as any).id,
       date: {
         gte: new Date(),
       },
