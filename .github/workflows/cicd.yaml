@@ -19,8 +19,8 @@ jobs:
 
       - name: Install dependencies
         run: npm i
-        working-directory: ./app
+        working-directory: ./quick_table_app
 
       - name: Run Build
         run: npm run build
-        working-directory: ./app
+        working-directory: ./quick_table_app
