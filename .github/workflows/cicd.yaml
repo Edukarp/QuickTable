@@ -6,6 +6,7 @@ on:
     - tests/unit
 
 jobs:
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -29,3 +30,34 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           NEXT_AUTH_SECRET: ${{ secrets.NEXT_AUTH_SECRET }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.16
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm i
+        working-directory: ./quick_table_app
+
+      - name: Run Tests
+        run: npm run test
+        working-directory: ./quick_table_app
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          NEXT_AUTH_SECRET: ${{ secrets.NEXT_AUTH_SECRET }}
+
+      - name: Upload Test Results
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: quick_table_app/__tests__/coverage
