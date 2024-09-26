@@ -31,6 +31,15 @@ jobs:
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           NEXT_AUTH_SECRET: ${{ secrets.NEXT_AUTH_SECRET }}
 
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-package
+          path: |
+            quick_table_app/.next
+            quick_table_app/package.json
+            quick_table_app/package-lock.json
+
   test:
     name: Test
     runs-on: ubuntu-latest
