@@ -45,7 +45,7 @@ const mockSession = {
     },
 };
 
-describe('RestaurantInfo', () => {
+describe('Test RestaurantInfo', () => {
     beforeEach(() => {
         (useRouter as jest.Mock).mockReturnValue({
             replace: jest.fn(),
