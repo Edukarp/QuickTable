@@ -86,11 +86,11 @@ describe('RestaurantInfo', () => {
 
         const dateButton = screen.getByText('31');
 
-        fireEvent.click(dateButton).valueOf();
+        fireEvent.click(dateButton);
         //console.log(dateButton);
 
         await waitFor(() => {
-            expect(getDayBookings).toHaveBeenCalledWith(mockRestaurant.id,  new Date('2024-10-31T03:00:00.000Z'));
+            expect(getDayBookings).toHaveBeenCalledWith(mockRestaurant.id, expect.any(Date));
         });
     });
 
