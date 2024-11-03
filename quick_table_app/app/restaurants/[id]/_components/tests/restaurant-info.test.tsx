@@ -84,7 +84,7 @@ describe('Test RestaurantInfo', () => {
 
         fireEvent.click(screen.getByText('Reservar'));
 
-        const dateButton = screen.getByText('31');
+        const dateButton = screen.getByText('20');
 
         fireEvent.click(dateButton);
         //console.log(dateButton);
@@ -100,7 +100,7 @@ describe('Test RestaurantInfo', () => {
 
         fireEvent.click(screen.getByText('Reservar'));
 
-        const dateButton = screen.getByText('31');
+        const dateButton = screen.getByText('20');
         fireEvent.click(dateButton);
 
         const timeButton = screen.getByText('18:00');
